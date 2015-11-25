@@ -11,7 +11,6 @@ from uuid import uuid4
 import click
 from click import BadParameter
 import gevent
-from gevent.event import Event
 import rlp
 from devp2p.service import BaseService
 from devp2p.peermanager import PeerManager
@@ -213,13 +212,7 @@ def run(ctx, dev, nodial, fake, console):
     if config['post_app_start_callback'] is not None:
         config['post_app_start_callback'](app)
 
-    # wait for interrupt
-    evt = Event()
-    gevent.signal(signal.SIGQUIT, evt.set)
-    gevent.signal(signal.SIGTERM, evt.set)
-    evt.wait()
-
-    # finally stop
+    app.join()
     app.stop()
 
 
@@ -295,14 +288,7 @@ def blocktest(ctx, file, name):
     for block in blocks[1:]:
         app.services.chain.chain.add_block(block)
 
-    # wait for interrupt
-    evt = Event()
-    gevent.signal(signal.SIGQUIT, evt.set)
-    gevent.signal(signal.SIGTERM, evt.set)
-    gevent.signal(signal.SIGINT, evt.set)
-    evt.wait()
-
-    # finally stop
+    app.join()
     app.stop()
 
 
