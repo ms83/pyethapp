@@ -160,6 +160,7 @@ def dump_config(config):
 def update_config_from_genesis_json(config, genesis_json_filename_or_dict):
     if isinstance(genesis_json_filename_or_dict, dict):
         genesis_dict = genesis_json_filename_or_dict
+        config.get('eth', {}).pop('genesis_hash', None)
     else:
         with open(genesis_json_filename_or_dict, "r") as genesis_json_file:
             genesis_dict = yaml.load(genesis_json_file)

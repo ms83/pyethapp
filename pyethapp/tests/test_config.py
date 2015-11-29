@@ -5,6 +5,7 @@ from py._path.local import LocalPath
 from pyethapp.eth_service import ChainService
 from pyethapp.jsonrpc import JSONRPCServer
 from pyethapp.db_service import DBService
+from pyethapp.utils import merge_dict
 from pyethapp import config
 import tempfile
 import copy
@@ -79,3 +80,12 @@ def test_setup_data_dir_existing_config(tmpdir):
     config.setup_data_dir(str(data_dir))
 
     assert data_dir.join(config.CONFIG_FILE_NAME).exists()
+
+
+def test_merge_dict(tmpdir):
+    source = {'eth': {'genesis': 'string'}}
+    dest = {'eth': {'genesis': {'key': 'value'}}}
+
+    merge_dict(dest, source)
+
+    assert type(dest['eth']['genesis']) == dict

@@ -125,5 +125,7 @@ def merge_dict(dest, source):
                             type(curr_dest[key])
                         ))
                 else:
-                    curr_dest[key] = curr_source[key]
+                    # Don't override if target is not dict
+                    if not isinstance(curr_dest[key], Mapping):
+                        curr_dest[key] = curr_source[key]
     return dest
