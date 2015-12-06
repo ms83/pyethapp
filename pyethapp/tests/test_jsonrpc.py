@@ -185,14 +185,15 @@ def test_app(request, tmpdir):
     return app
 
 
-def test_send_transaction(test_app):
+@pytest.mark.parametrize('tx_to', [address_encoder('\xff' * 20), '', '\0'*20])
+def test_send_transaction(test_app, tx_to):
     chain = test_app.services.chain.chain
     assert chain.head_candidate.get_balance('\xff' * 20) == 0
     sender = test_app.services.accounts.unlocked_accounts[0].address
     assert chain.head_candidate.get_balance(sender) > 0
     tx = {
         'from': address_encoder(sender),
-        'to': address_encoder('\xff' * 20),
+        'to': tx_to,
         'value': quantity_encoder(1)
     }
     tx_hash = data_decoder(test_app.rpc_request('eth_sendTransaction', tx))
@@ -434,3 +435,4 @@ def test_get_filter_changes(test_app):
     tx_hashes.append(test_app.rpc_request('eth_sendTransaction', tx))
     logs.append(test_app.rpc_request('eth_getFilterChanges', range_filter_id))
     assert sorted(logs[-1]) == sorted(logs_in_range + [pending_log])
+
